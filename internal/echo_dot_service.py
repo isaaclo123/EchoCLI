@@ -40,7 +40,7 @@ async def main() -> None:
     server = AsyncServer.from_uri(args.uri)
 
     try:
-        await server.run(partial(LEDsEventHandler, args))
+        await server.run(partial(LEDsEventHandler, args, led_client))
     except KeyboardInterrupt:
         pass
     finally:
