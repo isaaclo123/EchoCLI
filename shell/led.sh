@@ -18,44 +18,13 @@
 # - "zzz_rainbow"
 # - "zzz_turbo-boost"
 
-HOST="http://192.168.1.81"  # Replace with the local IP of the machine running the server script.
-LAST_RESPONSE=""
+PORT=8000
 
-send_request() {
-    local response
-    response=$(/data/local/tmp/curl -sSL "$HOST/led")  # Capture the response output
-
-    # Compare with the previous response
-    if [[ "$response" != "$LAST_RESPONSE" ]]; then
-        # Print the response body only if it's different from the last one
+/data/local/tmp/socat tcp-listen:$PORT,crlf,reuseaddr,fork 'SYSTEM:{
+    while read REPLY
+    do
         ledctrl -c
-        ledctrl -s $response
-        LAST_RESPONSE="$response"  # Update the last response
-    fi
-
-    local status_code=$?
-    return $status_code
-}
-
-handle_unsuccessful_req() {
-    while true; do
-        send_request
-        status_code=$?
-        if [[ $status_code -eq 0 ]]; then
-            break
-        else
-            sleep 30
-        fi
+        ledctrl -s $REPLY
+        echo $?
     done
-}
-
-while true; do
-    send_request
-    status_code=$?
-
-    if [[ $status_code -ne 0 ]]; then
-        echo "Request failed. Retrying..."
-        handle_unsuccessful_req
-    fi
-    sleep 5
-done
+}'
