@@ -19,12 +19,4 @@
 # - "zzz_turbo-boost"
 
 PORT=8000
-
-/data/local/tmp/socat tcp-listen:$PORT,crlf,reuseaddr,fork 'SYSTEM:{
-    while read REPLY
-    do
-        ledctrl -c
-        ledctrl -s $REPLY
-        echo $?
-    done
-}'
+/data/local/tmp/socat -v tcp-l:$PORT,fork exec:'sh /data/local/tmp/led_server.sh'

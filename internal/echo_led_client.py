@@ -1,6 +1,7 @@
 import socket
 import enum
 import logging
+import time
 
 _LOGGER = logging.getLogger()
 
@@ -44,7 +45,7 @@ class EchoLEDNetworkClient():
             _LOGGER.debug("LED option: '%s' already set; not sending", led_option.value)
             return True
 
-        self.socket.sendall(str.encode(f"${led_option.value}\n"))
+        self.socket.sendall(str.encode(f"{led_option.value}\n"))
         result = self.socket.recv(64)
 
         if result == b"0\n":
@@ -57,13 +58,19 @@ class EchoLEDNetworkClient():
 
 
 if __name__ == "__main__":
-    HOST="http://192.168.1.91"  # Replace with the local IP of the echo dot
+    HOST="10.0.0.97"  # Replace with the local IP of the echo dot
     PORT = 8000 # The port used by the echo dot
     led_client = EchoLEDNetworkClient(HOST, PORT)
     led_client.connect()
 
     print("test1", led_client.set(LEDOption.MICS_OFF_END))
+    time.sleep(1)
     print("test1.5", led_client.set(LEDOption.MICS_OFF_END))
+    time.sleep(1)
     print("test2", led_client.set(LEDOption.MICS_OFF_START))
+    time.sleep(1)
+    print("test3", led_client.set(LEDOption.SOLID_CYAN))
+    time.sleep(1)
+    print("test4", led_client.set(LEDOption.SOLID_RED))
 
     led_client.close()
