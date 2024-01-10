@@ -63,14 +63,9 @@ if __name__ == "__main__":
     led_client = EchoLEDNetworkClient(HOST, PORT)
     led_client.connect()
 
-    print("test1", led_client.set(LEDOption.MICS_OFF_END))
-    time.sleep(1)
-    print("test1.5", led_client.set(LEDOption.MICS_OFF_END))
-    time.sleep(1)
-    print("test2", led_client.set(LEDOption.MICS_OFF_START))
-    time.sleep(1)
-    print("test3", led_client.set(LEDOption.SOLID_CYAN))
-    time.sleep(1)
-    print("test4", led_client.set(LEDOption.SOLID_RED))
+    for led in LEDOption:
+        print(led.value, led_client.set(LEDOption.MICS_OFF_END))
+        led_client.set(led)
+        time.sleep(1)
 
     led_client.close()
