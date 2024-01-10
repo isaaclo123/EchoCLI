@@ -1,34 +1,17 @@
 #!/bin/bash
 
-HOST="http://192.168.1.81"  # Replace with the local IP of the machine running the server script.
-PORT="10902"
+PORT="8080"
 
-# ledctrl -s mics-off_start -b 100
-# ledctrl -s mics-off_on -b 100
+iptables -P INPUT ACCEPT
 
+cd /data/local/tmp
+/data/local/tmp/busybox mkfifo /data/local/tmp/audio_fifo
 
-while true; do
-    # Kill mixer process which takes control of audio interfaces
-    killall mixer
-    nohup tinycap -- -D 0 -d 24 -r 16000 -b 24 -c 9 -p 512 -n 5 | stdbuf -i0 nc -u $HOST $PORT &
-done
+# tinycap file.wav [-D card] [-d device] [-c channels] [-r rate] [-b bits] [-p period_size] [-n n_periods] [-t duration] [-f]
+killall tinycap
+killall mixer
+tinycap /data/local/tmp/audio_fifo -D 0 -d 24 -r 16000 -c 9 -b 24 -p 512 -n 5 -f &
 
-# while true; do
-#     # Kill mixer process which takes control of audio interfaces
-#     killall mixer
-# 
-#     # Record audio
-#     nohup tinycap /data/local/tmp/out.wav -- -D 0 -d 24 -r 16000 -b 24 -c 9 -p 512 -n 5 | nc -u $HOST $PORT &
-#     sleep 60
-#     killall tinycap
-# 
-#     send_request
-#     status_code=$?
-# 
-#     if [[ $status_code -ne 0 ]]; then
-#         echo "Request failed. Retrying..."
-#         handle_unsuccessful_req
-#     fi
-# 
-#     rm -f out.wav
-# done
+echo "run socat"
+
+/data/local/tmp/socat -u - TCP-LISTEN:$PORT,forever,fork < /data/local/tmp/audio_fifo
