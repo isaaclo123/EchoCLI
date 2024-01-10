@@ -64,8 +64,7 @@ if __name__ == "__main__":
     led_client.connect()
 
     for led in LEDOption:
-        print(led.value, led_client.set(LEDOption.MICS_OFF_END))
-        led_client.set(led)
+        print(led.value, led_client.set(led))
         time.sleep(1)
 
     led_client.close()
