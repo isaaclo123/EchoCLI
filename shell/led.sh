@@ -18,7 +18,5 @@
 # - "zzz_rainbow"
 # - "zzz_turbo-boost"
 
-iptables -P INPUT ACCEPT
-
 PORT=8000
 /data/local/tmp/socat -v tcp-l:$PORT,fork exec:'sh /data/local/tmp/led_server.sh'
